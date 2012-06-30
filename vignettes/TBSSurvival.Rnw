@@ -1,0 +1,402 @@
+% # TBSSurvival package for R (http://www.R-project.org)
+% # Copyright (C) 2012 Adriano Polpo, Cassio de Campos, Debajyoti Sinha
+% #                    Jianchang Lin and Stuart Lipsitz.
+% #
+% #    This program is free software: you can redistribute it and/or modify
+% #    it under the terms of the GNU General Public License as published by
+% #    the Free Software Foundation, either version 3 of the License, or
+% #    (at your option) any later version.
+% #
+% #    This program is distributed in the hope that it will be useful,
+% #    but WITHOUT ANY WARRANTY; without even the implied warranty of
+% #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% #    GNU General Public License for more details.
+% #
+% #    You should have received a copy of the GNU General Public License
+% #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+\documentclass[nogin,letterpaper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{caption,subfig}
+\usepackage{bm}
+\usepackage{verbatim}
+
+
+%Package
+%\usepackage{amsmath}
+\usepackage{amsfonts,amssymb}
+%\usepackage{mathrsfs}
+\usepackage{theorem}
+%\usepackage{subfigure}
+%\usepackage{graphicx,url}
+%\usepackage{float}
+%\usepackage{enumerate}
+%\interdisplaylinepenalty=2500
+
+%New symbols
+%\def\Rset{{\mathbb R}}
+%\def\Zset{{\mathbb Z}}
+%\def\Nset{{\mathbb N}}
+%\def\Eset{{\textnormal{E}}}
+%\def\Pset{{\mathbb P}}
+\def\Iset{{\mathbb I}}
+%\def\Mu{{\mathcal M}}
+%\def\Cclasse{{\mathscr C}}
+%\def\Pr{{\textnormal{Pr}}}
+
+%\def\contint{{\displaystyle \subset\hspace{-0,4cm}\int}}
+%\def\intprod{{\mathop{\textnormal{{\huge $\pi$}}}}}
+%\def\d{{\textnormal{d}}}
+%\newcommand{\somasalto}[3]{\sum\limits_{\stackrel{#1: \textnormal{ jump of } #2}{#3}}}
+%\newcommand{\Cint}[2]{\displaystyle \subset\hspace{-0,4cm}\int\limits_{#1}^{#2}}
+%\newcommand{\intprodeq}[2]{\mathop{\intprod}\limits_{#1}^{#2}}
+
+%Theorem
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Definition}{Definition}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Property}{Property}
+{\theorembodyfont{\rmfamily} \newtheorem{Example}{Example}}
+
+% \VignetteIndexEntry{TBSSurvival}
+
+%opening
+\title{R Package: TBSSurvival}
+
+\author{Adriano Polpo \and Cassio de Campos \and Debajyoti Sinha \and Stuart Lipsitz \and Jianchang Lin}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  The purpose of this text is to provide a simple manual for the
+  \verb=TBSSurvival= package for \verb=R= language. In short, we give some
+  examples on how to use the main functions of the package.
+\end{abstract}
+
+%\begin{keywords}
+{\it Keywords:} TBSSurvival, R package, Generalized Power Transformation, reliability, error distribution, median estimation.
+%\end{keywords}
+
+\section{Introduction}
+\label{intro}
+
+We assume the reader to be familiar with the survival estimation / reliability
+problem. For more details we suggest the technical paper:
+{\it Transform Both Sides Model: A Parametric Approach},
+Polpo et al. 2012. In this document we use as example a reliability analysis
+situation, but the methods will work as fine with survival analysis.
+
+The problem in view can be defined by \verb=time=, an array of times of failure
+(survival) or components (patients) and \verb=delta= the event indicator, that
+is, \verb=delta= equals to one if an event happened at that time, or zero in
+case of right-censoring. Furthermore, covariates can be present in the data set,
+which can be used in a regression analysis, in the very much same way as done by
+well-known functions such as \verb=survreg=. First, we exemplify the use of the
+methods without covariates.
+
+\begin{Example}
+\label{ex1}
+In this example we simulated data set with right-censored failure time. The
+problem is about an experiment with 30 machines. We observe the failure time of
+these machines, but our experiment has a maximum time of 6 week. After that, all
+machines that have not failed are considered to be censored with respect to
+their failure time. For simplicity, we define the failure time by a random
+variable with Gamma distribution.
+<<echo=FALSE>>=
+options(width=60)
+set.seed(1234)
+@
+<<example1>>=
+time <- pmin(rgamma(30,10,2),rep(6,30))
+delta <- rep(1,30)
+for (i in 1:30) {
+  if (time[i] == 6) delta[i] <- 0
+}
+data <- cbind(time,delta)
+data
+@
+\end{Example}
+
+\section{TBS Model}
+\label{TBSsec}
+
+The TBS Model is defined as
+\begin{equation}
+\label{TBSSurvival}
+g_\lambda(\log(T)) = g_\lambda(\theta(\mathbf{X})) + \varepsilon,
+\end{equation}
+\noindent
+where the function $g_\lambda(\cdot)$ is the TBS defined by
+\begin{equation}
+\label{gl}
+g_\lambda(u) = \frac{\textnormal{sign}(u) |u|^\lambda}{\lambda},
+\end{equation}
+\noindent
+$\textnormal{sign}(u) = 1$ if $u \geq 0$ and $\textnormal{sign}(u) = -1$ if $u < 0$, $\lambda > 0$, $\theta(\mathbf{X})$ is a function of co-variables and the error has some distribution ($\varepsilon \sim F_\varepsilon$) with parameter $\xi$.
+The error distributions currently implemented in the TBSSurvival package are:
+normal (used with \verb=dist= = \verb="norm"=), t-student ( \verb=dist= = \verb="t"=), Cauchy
+( \verb=dist= = \verb="cauchy"=), double-exponential ( \verb=dist= = \verb="doubexp"=) and
+logistic ( \verb=dist= = \verb="logistic"=) distributions.
+
+In case you have not yet done so, the first thing to do before using the functions is to install and load the library.
+
+<<tbsinst,eval=FALSE>>=
+install.packages("TBSSurvival_VERSION.tar.gz",repos=NULL,type="source")
+@ 
+<<<tbs>>=
+library("TBSSurvival")
+@
+
+\begin{Example}
+Density, reliability and hazard functiosn for TBS model are available using the
+commonly used notation: \verb=dtbs, ptbs, qtbs, rtbs, htbs=. The error
+distribution is passed as argument, as well some other parameters such as
+$\lambda$ (for the TBS), $\xi$ (parameter of the error distribution) and
+covariates' weights ${\boldsymbol\beta}$.
+<<label=fig1a,fig=TRUE,height=3,width=3,include=FALSE>>=
+x <- seq(0.1,10,0.1)
+plot(x, (1-ptbs(x,lambda=1,xi=sqrt(2),beta=1,
+                dist="norm")),
+     type="l",lwd=2,lty=1,col=2,ylim=c(0,1),xlab="t",
+     ylab="R(t)",main="Reliability",cex.lab=1.2)
+@
+<<label=fig1b,fig=TRUE,height=3,width=3,include=FALSE>>=
+plot(x, (dtbs(x,lambda=1,xi=sqrt(2),beta=1,
+              dist="norm")),
+     type="l",lwd=2,lty=1,col=2,xlab="t",
+     ylab="f(t)",main="Density",cex.lab=1.2)
+@
+<<label=fig1c,fig=TRUE,height=3,width=3,include=FALSE>>=
+plot(x, (htbs(x,lambda=1,xi=sqrt(2),beta=1,
+              dist="norm")),
+     type="l",lwd=2,lty=1,col=2,xlab="t",
+     ylab="h(t)",main="Hazard",cex.lab=1.2)
+@
+
+\begin{figure}[ht!]
+\centering
+\captionsetup{justification=centering}
+\subfloat{\includegraphics[scale=0.6,keepaspectratio=true]{TBSSurvival-fig1a}
+\label{fig_1a}}
+\subfloat{\includegraphics[scale=0.6,keepaspectratio=true]{TBSSurvival-fig1b}
+\label{fig_1b}}
+\subfloat{\includegraphics[scale=0.6,keepaspectratio=true]{TBSSurvival-fig1c}
+\label{fig_1c}}
+\caption{Density, reliability and Hazard functions \\ ($\lambda = 1$; $\epsilon \sim \textnormal{Normal}(0,2^2)$; $\beta_0 = 1$).}
+\label{fignorm}
+\end{figure}
+
+<<label=fig2a,fig=TRUE,height=3,width=3,include=FALSE>>=
+x <- seq(0.1,10,0.1)
+plot(x, (1-ptbs(x, lambda=1, xi=1, beta=1, dist="doubexp")),
+     type="l", lwd=2, lty=1, col=2, ylim=c(0,1), xlab="t", 
+     ylab="R(t)", main="Reliability", cex.lab=1.2)
+@
+<<label=fig2b,fig=TRUE,height=3,width=3,include=FALSE>>=
+plot(x, (dtbs(x, lambda=1, xi=1, beta=1, dist="doubexp")),
+     type="l", lwd=2, lty=1, col=2, xlab="t", ylab="f(t)",
+     main="Density", cex.lab=1.2)
+@
+<<label=fig2c,fig=TRUE,height=3,width=3,include=FALSE>>=
+plot(x, (htbs(x, lambda=1, xi=1, beta=1, 
+                    dist="doubexp")), type="l", lwd=2, 
+     lty=1, col=2, xlab="t", ylab="h(t)",
+     main="Hazard", cex.lab=1.2)
+@
+
+\begin{figure}[ht!]
+\centering
+\captionsetup{justification=centering}
+\subfloat{\includegraphics[scale=0.6,keepaspectratio=true]{TBSSurvival-fig2a}
+\label{fig_2a}}
+\subfloat{\includegraphics[scale=0.6,keepaspectratio=true]{TBSSurvival-fig2b}
+\label{fig_2b}}
+\subfloat{\includegraphics[scale=0.6,keepaspectratio=true]{TBSSurvival-fig2c}
+\label{fig_2c}}
+\caption{Density, reliability and Hazard functions \\ ($\lambda = 1$; $\epsilon \sim \textnormal{doubexp}(1)$; $\beta_0 = 1$).}
+\label{figdoubexp}
+\end{figure}
+
+\end{Example}
+
+\subsection{Error distribution}
+
+Table \ref{table_1} presents the available error distributions. Note that the
+meaning of the parameter changes according to the distribution being used. Moreover, for
+the normal distribution, the parameter is $\sigma$ (standard deviation) and not
+$\sigma^2$ (variance).
+
+\begin{center}
+\begin{table}[ht!]
+\caption{Error distribution.}
+\label{table_1}
+\centering
+\begin{tabular}{ccc}
+\hline
+Distribution & Parameter & Density function ($f_\varepsilon(\epsilon | \xi)$) \\
+\hline
+\hline
+Normal & $\xi = \sigma$ & $(2 \pi \sigma^2)^{-1/2} \exp\left\{-\epsilon^2/(2 \sigma^2)
+\right\}$ \vspace{0.1cm}\\
+DoubExp & $\xi = b$ & $(2b)^{-1} \exp\left\{ -|\epsilon|/b \right\} $ \vspace{0.1cm}\\
+t-Student & $\xi = \eta  (d.f.)$ & $\frac{\Gamma((\eta+1)/2)}{\Gamma(\eta/2)
+\sqrt{\pi \eta}} \left(1 + \frac{\epsilon^2}{\eta} \right)^{-(\eta+1)/2} $ \vspace{0.1cm}\\
+Cauchy & $\xi = c$ & $ \left[\pi c \left(1 + (\epsilon/c)^2\right)\right]^{-1} $ \vspace{0.1cm}\\
+Logistic & $\xi = s$ & $\frac{\exp\{-\epsilon/s\}}{s \left[\left(1+\exp\{-\epsilon/s\}\right)^2\right]}$ \\ \hline
+\end{tabular}
+\caption*{{\footnotesize The parametric space for $\xi$ is $(0,+\infty)$ in all cases. \hspace{2cm}~}}
+\end{table}
+\end{center}
+
+\section{Estimation}
+
+The most important part is the parameter estimation of the TBS model. There are
+two procedures available: Maximum Likelihood Estimation (MLE) and Bayesian
+Estimation (BE). For illustration purposes, we will perform the estimation with
+both methods for the simulated data in Example \ref{ex1}. Remember that we
+defined the observed failure time as \verb=time= and the censor indicator
+$\delta$ as \verb=delta=.
+
+\subsection{MLE}
+
+In order to perform the estimation, following the common practice with other
+survival analysis packages, the user has to build a formula with time
+and censoring indication (delta), which is then used to call the estimation
+method itself:
+
+<<mle>>=
+formula <- Surv(data[,1],data[,2]) ~ 1
+tbs.mle <- tbs.survreg.mle(formula,dist="norm", nstart=3,
+                           method="Nelder-Mead")
+tbs.mle
+@
+
+Here, we compare the TBS model with the non-parametric Kaplan-Meier estimator.
+The result is presented in the Figure \ref{figtbsmle}.
+
+<<mlekm>>=
+# Kaplan-Meier estimation
+km <- survfit(formula)
+@
+<<label=mlekm,fig=TRUE,height=5,width=5,include=FALSE>>=
+plot(km,ylab="R(t)", xlab="t: number of cycles (in thousands)",
+     main="Reliability function (MLE)", conf.int=FALSE, lty=1, 
+     lwd=1, xlim=c(min(data[,1]),max(data[,1])))
+t <- seq(min(data[,1]),max(data[,1]),
+         (max(data[,1])-min(data[,1])-0.01)/1000)
+legend(2.6,0.2,
+   c("Kaplan-Meier",
+     expression(textstyle(paste("TBS / ",sep="")) ~ epsilon
+         ~ textstyle(paste("~",sep="")) ~ Norm)),
+   col=c(1,2),lty=c(1,1),cex=1.1,lwd=c(1,2),bg="white")
+lines(t,1-ptbs(t, lambda=tbs.mle$par[1], xi=tbs.mle$par[2],
+               beta=tbs.mle$par[3], 
+               dist=tbs.mle$error.dist), type="l",
+      lwd=2, col=2, lty=1)
+@
+
+\begin{figure}[ht!]
+\centering
+\captionsetup{justification=centering}
+\includegraphics[scale=0.8,keepaspectratio=true]{TBSSurvival-mlekm}
+\caption{TBS model (MLE).}
+\label{figtbsmle}
+\end{figure}
+
+In the following, we present a simple example on how to define covariates to be
+used. In fact, we use the same framework of formulas as other survival packages.
+We also point out that different optimization methods are available in order to
+maximize the likelihood with the TBS model. If the argument \verb=method= is not
+specific, all of them will be tried, and eventually the best one will be
+returned. The output, saved in the variable \verb=s= in the following example,
+contains some score criteria and other useful information.
+<<covars,eval=FALSE>>=
+library(survival)
+data(colon)
+## Running MLE on colon (from survival package) with a covariate
+colon$age60=as.numeric(colon$age>60) #threshold defined from medical papers
+s=tbs.survreg.mle(Surv(colon$time,colon$status==1) ~ colon$age60,
+      dist="norm",method=c("Nelder-Mead"),nstart=3,verbose=FALSE)
+@
+
+
+\subsection{BE}
+
+When dealing with the Bayesian estimation, it is necessary to consider an
+informative choice of priors, as well as the convergence rate of the MCMC
+method, on which the estimation is based. However, we have experimented with
+some reasonable non-informative priors, which have shown adequate results.
+Nevertheless, the user is entitled to choose \verb=prior.mean= and
+\verb=prior.sd= for the normal distribution that is used as prior for the
+${boldsymbol \beta}$, a \verb=scale= parameter, and initial guesses for the
+previously mentioned parameters of the model. Other well known arguments that
+are used my the Metropolis Hastings can also be set. We refer to the technical
+paper for more details about the priors.
+
+<<be>>=
+tbs.be <- tbs.survreg.be(formula,dist="norm",
+                         guess.lambda=2,guess.xi=4,
+                         guess.beta=1.5,burn=1000,
+                         jump=10,size=1000,scale=0.06)
+@
+
+As a visual example, we construct the plots with the estimated reliability and
+the 95\% credible interval of High Posterior Density of the reliability function.
+The result is presented in the Figure \ref{figtbsbe}.
+
+<<label=bekm,fig=TRUE,height=5,width=5,include=FALSE>>=
+aux.survival <- matrix(0,length(tbs.be$time),1000)
+for (j in 1:1000) {
+  aux.survival[,j] <- 
+    c(1-ptbs(tbs.be$time,
+             lambda=tbs.be$post[j,1],
+             xi=tbs.be$post[j,2],
+             beta=tbs.be$post[j,3:length(tbs.be$post[1,])],
+             x=tbs.be$x,dist="norm"))
+}
+survival <- matrix(0,length(tbs.be$time),8)
+for (i in 1:length(tbs.be$time)) {
+  survival[i,] <- 
+    c(summary(aux.survival[i,]),
+      HPDinterval(as.mcmc(aux.survival[i,]),0.95))
+}
+tbs.be$survival <- survival
+
+plot(km,ylab="R(t)", 
+     xlab="t: number of cycles (in thousands)",
+     main="Reliability function (BE)", conf.int=FALSE, 
+     lty=1, lwd=1, xlim=c(min(data[,1]),max(data[,1])))
+legend(2.6,0.3,
+  c("Kaplan-Meier",
+    expression(textstyle(paste("TBS / ",sep="")) ~ epsilon
+        ~ textstyle(paste("~",sep="")) ~ Logistic),
+    "95% HPD Interval"),
+  col=c(1,2,2),lty=c(1,1,2),cex=1.1,lwd=c(1,2,2),
+  bg="white")
+lines(tbs.be$time,tbs.be$survival[,3],type="l",lwd=2,col=2,
+      lty=1)
+lines(tbs.be$time,tbs.be$survival[,7],type="l",lwd=2,col=2,
+      lty=2)
+lines(tbs.be$time,tbs.be$survival[,8],type="l",lwd=2,col=2,
+      lty=2)
+@
+
+\begin{figure}[ht!]
+\centering
+\captionsetup{justification=centering}
+\includegraphics[scale=0.8,keepaspectratio=true]{TBSSurvival-bekm}
+\caption{TBS model (BE).}
+\label{figtbsbe}
+\end{figure}
+
+\section{Remarks}
+
+This ``manual'' describes the basis of the TBSSurvival package, which is mainly
+centered around the estimation methods. We invite the user to the functions'
+help pages (available with the package) and the technical paper mentioned in the
+beginning of this document.
+
+\end{document}
