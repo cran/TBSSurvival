@@ -1,7 +1,7 @@
 'TBSSurvival' is a R library design to perform the TBS model for
 reliability data.
 
-Copyright (C) 2012, Adriano Polpo and D. Sinha.
+Copyright (C) 2012-2013, Adriano Polpo and D. Sinha.
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public

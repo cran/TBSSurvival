@@ -1,5 +1,5 @@
 # TBSSurvival package for R (http://www.R-project.org)
-# Copyright (C) 2012 Adriano Polpo, Cassio de Campos, Debajyoti Sinha
+# Copyright (C) 2013 Adriano Polpo, Cassio de Campos, Debajyoti Sinha
 #                    Jianchang Lin and Stuart Lipsitz.
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,8 @@ installpacks <- function(loc=NULL,repos="http://stat.ethz.ch/CRAN/") {
 #  install.packages("e1071",lib=loc)
 #  install.packages("eha",lib=loc)
   install.packages("truncnorm",lib=loc)
-
+  install.packages("BMS",lib=loc)
+  
   ## this following line install the TBS package itself, so nothing else is needed.
   ## For testing, sometimes it is better to work without installing it for a while...
   ##      install.packages('./TBSSurvival_version.tar.gz',repos=NULL,type="source")
@@ -42,7 +43,8 @@ installpacks <- function(loc=NULL,repos="http://stat.ethz.ch/CRAN/") {
 loadlibs <- function(libdir=NULL) {
   w <- options("warn")
   options("warn" = -1)
-  if(require("TBSSurvival",quietly=TRUE)==FALSE) {
+  if (require("TBSSurvival",quietly=TRUE)==FALSE) {
+    library("BMS",lib.loc=libdir)
     library("coda",lib.loc=libdir)
     library("mcmc",lib.loc=libdir)
     library("normalp",lib.loc=libdir)
@@ -55,11 +57,23 @@ loadlibs <- function(libdir=NULL) {
 #    library("eha",lib.loc=libdir)
     library("truncnorm",lib.loc=libdir)
     source("../R/tbs.survreg.be.r")
-    source("../R/tbs.r")
+    source("../R/ptbs.r")
+    source("../R/qtbs.r")
+    source("../R/dtbs.r")
+    source("../R/rtbs.r")
+    source("../R/htbs.r")
     source("../R/tbs.survreg.mle.r")
     source("../R/local.r")
+    source("../R/dt2.r")
+    source("../R/dlogis2.r")
+    source("../R/dist.error.r")
+    
   } else {
     library("TBSSurvival")
   }
   options("warn" = w[[1]])
 }
+
+## Load data
+alloyT7987 <- read.table("../data/alloyT7987.txt",header=TRUE)
+

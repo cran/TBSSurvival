@@ -25,5 +25,18 @@ Alloy - T7987: data extracted from Meeker and Escobar (1998), pp. 131.
 }
 \examples{
 ## See \link{tbs.survreg.mle} and \link{tbs.survreg.be}.
+
+## The data looks like this:
+## time delta
+##  94     1
+##  96     1
+##  99     1
+##  99     1
+## 104     1
+## 108     1
+## 112     1
+## 114     1
+## 117     1
+## 117     1
 }
 \keyword{TBS}
