@@ -1,3 +1,11 @@
+importFrom(normalp,pnormp,dnormp,rnormp,qnormp)
+importFrom(mcmc,metrop)
+importFrom(coda,HPDinterval,as.mcmc)
+importFrom(survival,Surv,survfit)
+importFrom(R.utils,withTimeout)
+importFrom(BMS,f21hyper)
+importFrom(Rsolnp,gosolnp)
+
 S3method(print, tbs.survreg.mle)
 S3method(plot, tbs.survreg.mle)
 S3method(summary, tbs.survreg.mle)

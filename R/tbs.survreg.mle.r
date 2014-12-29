@@ -164,7 +164,7 @@ print.tbs.survreg.mle <- function(x, ...) {
     cat("--------------------------------------------------------\n",sep="")
     cat("\n",sep="")
   } else {
-    cat("There was not obtained the convergence.\n",sep="")
+    cat("There was no convergence.\n",sep="")
   }
 }
 
@@ -299,7 +299,7 @@ summary.tbs.survreg.mle <- function(object, ...) {
   }
 }
 
-plot.tbs.survreg.mle.best <- function(x, plot.type='surv', type="l", xlim=NULL, 
+plot.tbs.survreg.mle.best <- function(x, plot.type=NULL, type="l", xlim=NULL, 
                                       ylim=NULL, main=NULL, xlab=NULL, ylab=NULL,
                                       lty=NULL, lwd=NULL, col=NULL, ...) {
   plot.tbs.survreg.mle(x[[x$best.n]], plot.type=plot.type, type=type, xlim=xlim,
@@ -307,14 +307,17 @@ plot.tbs.survreg.mle.best <- function(x, plot.type='surv', type="l", xlim=NULL,
                        col=col, ...)
 }
 
-plot.tbs.survreg.mle <- function(x, plot.type='surv', type="l", xlim=NULL, ylim = NULL,
+plot.tbs.survreg.mle <- function(x, plot.type=NULL, type="l", xlim=NULL, ylim = NULL,
                                  main = NULL, xlab = NULL, ylab = NULL,
                                  lty = NULL, lwd = NULL, col = NULL, ...) {
-  if(! (plot.type %in% c('surv','hazard','error')))
-    stop('Invalid plot type for tbs.survreg.mle. Options are surv, hazard, error.')
-
+  if(is.null(plot.type)) {
+    if(is.null(x$x)) plot.type <- 'error'
+    else plot.type <- 'surv'
+  }
   if ((is.null(x$x)) && (! (plot.type %in% c('error'))))
     stop('Invalid plot type for tbs.survreg.mle. It is only possible to use option \'error\' for the estimated model.')
+  if(! (plot.type %in% c('surv','hazard','error')))
+    stop('Invalid plot type for tbs.survreg.mle. Options are surv, hazard, error.')
 
   if (x$convergence) {
     h <- 1000

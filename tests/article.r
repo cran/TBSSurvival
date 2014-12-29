@@ -107,7 +107,7 @@ print(summary(alloyT7987$time))
 cat("\n"); cat("Maximum Likelihood Estimation:\n")
 
 ## MLE Estimation for each possible error distribution
-tbs.mle <- tbs.survreg.mle(Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist=dist.error("all"))
+tbs.mle <- tbs.survreg.mle(survival::Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist=dist.error("all"))
 
 ## Building the Table of Example (MLE)
 ## This is only for ease of inclusion in the paper, as the results are all available
@@ -149,7 +149,7 @@ rm(text)
 
 ## Estimating the Kaplan-Meier
 ## This is used to plot the graph with the comparison of the estimations
-km <- survfit(formula = Surv(alloyT7987$time, alloyT7987$delta == 1) ~ 1)
+km <- survival::survfit(formula = survival::Surv(alloyT7987$time, alloyT7987$delta == 1) ~ 1)
 
 i.fig <- i.fig+1
 ## Figure 2(a) - Reliability functions (MLE)
@@ -159,7 +159,7 @@ postscript(name,width=5,height=5,paper="special",colormodel="gray",horizontal=FA
 plot(tbs.mle$norm,lwd=2,col="gray20",ylab="R(t)",
      xlab="t: number of cycles (in thousands)",
      main="Reliability function (MLE)",cex.lab=1.2)
-km <- survfit(formula = Surv(alloyT7987$time, alloyT7987$delta == 1) ~ 1)
+km <- survival::survfit(formula = survival::Surv(alloyT7987$time, alloyT7987$delta == 1) ~ 1)
 lines(km)
 dev.off()
 
@@ -186,15 +186,15 @@ cat("\n"); cat("Bayesian Estimation:\n")
 
 ## Bayesian Estimation
 ## We run for each of the five error functions
-tbs.bayes.norm     <- tbs.survreg.be(Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist=dist.error("norm"),
+tbs.bayes.norm     <- tbs.survreg.be(survival::Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist=dist.error("norm"),
                                      burn=500000,jump=2000,size=1000,scale=0.07)
-tbs.bayes.t        <- tbs.survreg.be(Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist=dist.error("t"),
+tbs.bayes.t        <- tbs.survreg.be(survival::Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist=dist.error("t"),
                                      burn=500000,jump=2000,size=1000,scale=0.07)
-tbs.bayes.cauchy   <- tbs.survreg.be(Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist=dist.error("cauchy"),
+tbs.bayes.cauchy   <- tbs.survreg.be(survival::Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist=dist.error("cauchy"),
                                      burn=500000,jump=2000,size=1000,scale=0.07)
-tbs.bayes.doubexp  <- tbs.survreg.be(Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist=dist.error("doubexp"),
+tbs.bayes.doubexp  <- tbs.survreg.be(survival::Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist=dist.error("doubexp"),
                                      burn=500000,jump=2000,size=1000,scale=0.07)
-tbs.bayes.logistic <- tbs.survreg.be(Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist=dist.error("logistic"),
+tbs.bayes.logistic <- tbs.survreg.be(survival::Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist=dist.error("logistic"),
                                      burn=500000,jump=2000,size=1000,scale=0.07)
 
 ## Here it is the code for Building the Table that goes into the paper
@@ -283,22 +283,22 @@ if (flag.convergence) {
   dev.off()
   
   # Analysis with 4 chains
-  chain.logistic1 <- tbs.survreg.be(Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist="logistic",
+  chain.logistic1 <- tbs.survreg.be(survival::Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist="logistic",
                                     guess.beta=tbs.mle$logistic$beta,
                                     guess.lambda=tbs.mle$logistic$lambda,
                                     guess.xi=tbs.mle$logistic$xi,
                                     burn=1,jump=1,size=250000,scale=0.06)
-  chain.logistic2 <- tbs.survreg.be(Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist="logistic",
+  chain.logistic2 <- tbs.survreg.be(survival::Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist="logistic",
                                     guess.beta=6,
                                     guess.lambda=1,
                                     guess.xi=1,
                                     burn=1,jump=1,size=250000,scale=0.06)
-  chain.logistic3 <- tbs.survreg.be(Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist="logistic",
+  chain.logistic3 <- tbs.survreg.be(survival::Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist="logistic",
                                     guess.beta=4,
                                     guess.lambda=2,
                                     guess.xi=2,
                                     burn=1,jump=1,size=250000,scale=0.06)
-  chain.logistic4 <- tbs.survreg.be(Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist="logistic",
+  chain.logistic4 <- tbs.survreg.be(survival::Surv(alloyT7987$time,alloyT7987$delta) ~ 1,dist="logistic",
                                     guess.beta=5.5,
                                     guess.lambda=0.5,
                                     guess.xi=0.5,
@@ -389,10 +389,10 @@ data(colon)
 cat("\n"); cat("Maximum Likelihood Estimation:\n")
 
 # Estimating TBS model with normal error distribution
-fit.mle <- tbs.survreg.mle(Surv(colon$time,colon$status) ~ colon$node4,dist=dist.error("norm"))
+fit.mle <- tbs.survreg.mle(survival::Surv(colon$time,colon$status) ~ colon$node4,dist=dist.error("norm"))
 
 # Kaplan-Meier estimates
-km <- survfit(formula = Surv(colon$time,colon$status) ~ colon$node4)
+km <- survival::survfit(formula = survival::Surv(colon$time,colon$status) ~ colon$node4)
 
 ## Figure 4(a): estimated survival functions (MLE)
 ## This plots the Kaplan-Meier and the TBS curves for the colon data set,
@@ -429,7 +429,7 @@ cat("\n"); cat("Bayesian Estimation:\n")
 ## Estimating TBS model with normal error distribution
 ## The same as before for the colon data set with node4 as discriminative covariate,
 ## but now using the Bayesian estimation
-fit.be <- tbs.survreg.be(Surv(colon$time,colon$status) ~ colon$node4,dist="norm",
+fit.be <- tbs.survreg.be(survival::Surv(colon$time,colon$status) ~ colon$node4,dist="norm",
                          burn=50000,jump=500,size=1000,scale=0.05)
 
 ## Figure 4(b): estimated survival functions (BE)

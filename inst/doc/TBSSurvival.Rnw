@@ -107,6 +107,7 @@ their failure time. For simplicity, we define the failure time by a random
 variable with the Gamma distribution.
 <<echo=FALSE>>=
 options(width=60)
+set.seed(1)
 @
 <<example1>>=
 time <- pmin(rgamma(30,10,2),rep(6,30))
@@ -290,7 +291,7 @@ and censoring indication (delta), which is then used to call the estimation
 method itself:
 
 <<mle>>=
-formula <- Surv(data[,1],data[,2]) ~ 1
+formula <- survival::Surv(data[,1],data[,2]) ~ 1
 tbs.mle <- tbs.survreg.mle(formula,dist=mynormal, nstart=3,
                            method="Nelder-Mead")
 tbs.mle
@@ -301,7 +302,7 @@ The result is presented in the Figure \ref{figtbsmle}.
 
 <<label=mlekm,fig=TRUE,height=5,width=5,include=FALSE>>=
 # Kaplan-Meier estimation
-km <- survfit(formula)
+km <- survival::survfit(formula)
 plot(tbs.mle,lwd=2,col="gray20",ylab="R(t)",
      xlab="t: number of cycles (in thousands)",
      main="Reliability function (MLE)",cex.lab=1.2)

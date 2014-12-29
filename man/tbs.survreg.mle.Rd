@@ -76,11 +76,11 @@ alloyT7987$time <- as.double(alloyT7987$time)
 alloyT7987$delta <- as.double(alloyT7987$delta)
 
 # MLE estimation with logistic error
-formula <- Surv(alloyT7987$time,alloyT7987$delta == 1) ~ 1
+formula <- survival::Surv(alloyT7987$time,alloyT7987$delta == 1) ~ 1
 tbs.mle <- tbs.survreg.mle(formula,dist=dist.error("logistic"),method="Nelder-Mead",nstart=3)
 
 # Kaplan-Meier estimation
-km <- survfit(formula)
+km <- survival::survfit(formula)
 
 # Plot survival function
 plot(tbs.mle)

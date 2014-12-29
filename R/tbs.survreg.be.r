@@ -138,10 +138,10 @@ tbs.survreg.be <- function(formula,dist=dist.error("norm"),max.time=-1,
   }
 
   ## call the Metropolis algorithm for MCMC
-  chain <- try(evalWithTimeout(metrop(obj=.logpost,initial=guess,time=time,delta=delta,dist=dist,x=x,
+  chain <- try(withTimeout(metrop(obj=.logpost,initial=guess,time=time,delta=delta,dist=dist,x=x,
                                       mean=prior.mean,sd=prior.sd,
                                       nbatch=(size-1)*jump+burn,blen=1,nspac=1,scale=scale),
-                               timeout=max.time*60,onTimeout="error"),silent=TRUE)
+                           timeout=max.time*60,onTimeout="error"),silent=TRUE)
   if(length(class(chain)) == 1 && class(chain) == "try-error") {
     stop("Time limit exceeded")
   }
