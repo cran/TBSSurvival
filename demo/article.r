@@ -40,7 +40,8 @@ set.seed(1234)
 ##########################################
 ## Section 2. Transform-both-side model ##
 ##########################################
-
+if(FALSE) { ## PROBLEMS IN CRAN, SO DON'T RUN IT THERE
+    
 i.fig <- 1 # counter figure number
 ## Figure 1(a)
 ## hazard functions with normal N(0,1) error
@@ -469,3 +470,4 @@ rm(median.0,median.1,O)
 ## this file should run in about 2 to 3 hours in a modern computer (as of June-2012).
 run.time <- (proc.time()[3]-initial.time[3])/60
 print(run.time)
+}

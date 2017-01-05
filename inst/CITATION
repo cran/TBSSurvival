@@ -8,11 +8,13 @@ citEntry(entry = "Article",
                    as.person("Debajyoti Sinha"),
 				   as.person("Stuart Lipsitz"),
 				   as.person("Jianchang Lin")),
-  journal      = "Under review",
-  year         = "2012",
+  journal      = "Computational Statistics and Data Analysis",
+  pages        = "903-913",
+  volume       = "71",
+  year         = "2014",
   url          = "http://code.google.com/p/tbssurvival/",
   textVersion  =
-  paste("A. Polpo and C. P. de Campos and D. Sinha and S. Lipsitz and J. Lin (2012).",
-        "TBSSurvival R package",
-        "URL http://code.google.com/p/tbssurvival/.")
+  paste("A. Polpo and C. P. de Campos and D. Sinha and S. Lipsitz and J. Lin (2014).",
+        "Transform Both Sides Model: A Parametric Approach",
+        "Computational Statistics and Data Analysis http://dx.doi.org/10.1016/j.csda.2013.07.023")
 )

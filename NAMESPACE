@@ -5,6 +5,13 @@ importFrom(survival,Surv,survfit)
 importFrom(R.utils,withTimeout)
 importFrom(BMS,f21hyper)
 importFrom(Rsolnp,gosolnp)
+importFrom("graphics", "hist", "lines", "par", "plot")
+importFrom("stats", "acf", "dcauchy", "dexp", "dlogis", "dnorm",
+           "dunif", "model.frame", "model.matrix", "model.response",
+           "optim", "pbeta", "pcauchy", "plogis", "pnorm", "ppoints",
+           "qbeta", "qcauchy", "qlogis", "qnorm", "qqline", "qqplot",
+           "quantile", "rcauchy", "rlogis", "rnorm", "runif", "sd",
+           "ts")
 
 S3method(print, tbs.survreg.mle)
 S3method(plot, tbs.survreg.mle)
